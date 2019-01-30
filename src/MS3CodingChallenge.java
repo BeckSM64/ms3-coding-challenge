@@ -44,84 +44,84 @@ public class MS3CodingChallenge {
 	}
 	
 	/* Parses the CSV with the list reader and inserts each row into an in-memory SQLite database (Needs to be cleaned up) */
-	public static void readCSVListReader(String csvFilePath) throws IOException {
+	public static void readCSV(String csvFilePath) throws IOException {
 		
 		ICsvListReader listReader = null;
         try {
+        	
         	listReader = new CsvListReader(new FileReader(csvFilePath), CsvPreference.STANDARD_PREFERENCE);
-                
             listReader.getHeader(true);
                 
-            List<Object> recordList;
-            while( (listReader.read()) != null ) {
+            List<Object> record;
+            while(listReader.read() != null) {
             	
             	recordsReceived++;//Increment number of records received when one is encountered
             	CellProcessor[] processors = getProcessors();
             	
             	//Only process rows which contain the correct number of columns (10)
             	if(listReader.length() == 10) {
-            		recordList = listReader.executeProcessors(processors);
-                	System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s", listReader.getLineNumber(),
-                    listReader.getRowNumber(), recordList));
-                	
+            		
+            		record = listReader.executeProcessors(processors);
+            		System.out.println(String.format("line number=%s, row number=%s, record=%s", listReader.getLineNumber(), listReader.getRowNumber(), record));
+            		
                 	//Check if values are null before calling toString() (Probably a better way to do this)
                 	String a, b, c, d, e, f, g, h, i, j;
-                	if(recordList.get(0) != null) {
-                		a = recordList.get(0).toString();
+                	if(record.get(0) != null) {
+                		a = record.get(0).toString();
                 	} else {
                 		a = null;
                 	}
                 	
-                	if(recordList.get(1) != null) {
-                		b = recordList.get(1).toString();
+                	if(record.get(1) != null) {
+                		b = record.get(1).toString();
                 	} else {
                 		b = null;
                 	}
                 	
-                	if(recordList.get(2) != null) {
-                		c = recordList.get(2).toString();
+                	if(record.get(2) != null) {
+                		c = record.get(2).toString();
                 	} else {
                 		c = null;
                 	}
                 	
-                	if(recordList.get(3) != null) {
-                		d = recordList.get(3).toString();
+                	if(record.get(3) != null) {
+                		d = record.get(3).toString();
                 	} else {
                 		d = null;
                 	}
                 	
-                	if(recordList.get(4) != null) {
-                		e = recordList.get(4).toString();
+                	if(record.get(4) != null) {
+                		e = record.get(4).toString();
                 	} else {
                 		e = null;
                 	}
                 	
-                	if(recordList.get(5) != null) {
-                		f = recordList.get(5).toString();
+                	if(record.get(5) != null) {
+                		f = record.get(5).toString();
                 	} else {
                 		f = null;
                 	}
                 	
-                	if(recordList.get(6) != null) {
-                		g = recordList.get(6).toString();
+                	if(record.get(6) != null) {
+                		g = record.get(6).toString();
                 	} else {
                 		g = null;
                 	}
                 	
-                	if(recordList.get(7) != null) {
-                		h = recordList.get(7).toString();
+                	if(record.get(7) != null) {
+                		h = record.get(7).toString();
                 	} else {
                 		h = null;
                 	}
                 	
-                	if(recordList.get(8) != null) {
-                		i = recordList.get(8).toString();
+                	if(record.get(8) != null) {
+                		i = record.get(8).toString();
                 	} else {
                 		i = null;
                 	}
                 	
-                	if(recordList.get(9) != null) {
-                		j = recordList.get(9).toString();
+                	if(record.get(9) != null) {
+                		j = record.get(9).toString();
                 	} else {
                 		j = null;
                 	}
@@ -129,7 +129,7 @@ public class MS3CodingChallenge {
                 	db.insert(a, b, c, d, e, f, g, h, i, j);//Insert into sqlite database
                 	recordsSuccessful++;//Increment number of records successfull
                 	
-            	} else if(listReader.length() == 11) {
+            	} else if(listReader.length() == 11) {//Assumes that if column number doesn't match then it contains 11 because that happens to be the case with this particular CSV file
             		
             		//Use this if columns are equal to 11 for a row
             		processors = new CellProcessor[] { 
@@ -147,17 +147,15 @@ public class MS3CodingChallenge {
         	                new Optional()//K (Extra column)
         	        };
             		
-            		recordList = listReader.executeProcessors(processors);
-            		System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s", listReader.getLineNumber(),
-                            listReader.getRowNumber(), recordList));
-            		writeCsv(recordList);
+            		record = listReader.executeProcessors(processors);
+            		System.out.println(String.format("line number=%s, row number=%s, record=%s", listReader.getLineNumber(), listReader.getRowNumber(), record));
+            		writeCsv(record);//Write bad data to CSV file with timestamp
             		recordsFailed++;//Increment number of records failed (Too many columns)
             	}
             }
                 
-        }
-        finally {
-        	if( listReader != null ) {
+        } finally {
+        	if(listReader != null) {
         		listReader.close();
         	}
         }
@@ -191,13 +189,6 @@ public class MS3CodingChallenge {
 	                new Optional(),//J
 	                new Optional()//K (The extra column)
 	        };
-        	
-        	//Column Headers
-        	final String[] header = new String[] {"A", "B", "C", "D",
-            	"E", "F", "G", "H", "I", "J", "K"};
-                
-        	//Write the column headers to the specified csv file
-        	//listWriter.writeHeader(header);
                 
         	//Write the record to the file
         	listWriter.write(record, processors);
@@ -241,7 +232,7 @@ public class MS3CodingChallenge {
 		
 		//Attempt to parse csv and write to database
 		try {
-			readCSVListReader(csvFilePath);
+			readCSV(csvFilePath);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
