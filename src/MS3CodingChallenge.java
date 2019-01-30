@@ -169,10 +169,13 @@ public class MS3CodingChallenge {
                 
         ICsvListWriter listWriter = null;
         try {
-        	Date currentTimestamp = new Date();
-        	Random rng = new Random();
-        	String writeToFilePath = "bad-data-" + rng.nextInt(30000) + ".csv";//Create the name of the file that will be written to
-        	listWriter = new CsvListWriter(new FileWriter(writeToFilePath),
+        	Date currentTimestamp = new Date();//Grab the current date
+        	String timestampString = currentTimestamp.toString().replace(' ', '-');//Replace spaces with hyphens (string builder instead?)
+        	timestampString = timestampString.replace(':', '-');//Replace colons with hyphens
+        	//timestampString += System.currentTimeMillis();//Add milliseconds to the end of date so names are unique
+        	
+        	String writeToFilePath = "bad-data-" + timestampString + ".csv";//Create the name of the file that will be written to
+        	listWriter = new CsvListWriter(new FileWriter(writeToFilePath, true),
         	CsvPreference.STANDARD_PREFERENCE);//Create list writer with standard preferences
                 
         	final CellProcessor[] processors = new CellProcessor[] { 
@@ -195,14 +198,13 @@ public class MS3CodingChallenge {
             	"E", "F", "G", "H", "I", "J", "K"};
                 
         	//Write the column headers to the specified csv file
-        	listWriter.writeHeader(header);
+        	//listWriter.writeHeader(header);
                 
         	//Write the record to the file
         	listWriter.write(record, processors);
                 
-        }
-        finally {
-        	if( listWriter != null ) {
+        } finally {
+        	if(listWriter != null) {
         		listWriter.close();
             }
         }
