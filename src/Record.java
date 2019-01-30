@@ -1,16 +1,16 @@
 
 public class Record {
 	
-	String fname;
-	String lname;
-	String email;
-	String gender;
-	String image;
-	String creditCard;
-	String charge;
-	String bool1;
-	String bool2;
-	String city;
+	String a;
+	String b;
+	String c;
+	String d;
+	String e;
+	String f;
+	String g;
+	String h;
+	String i;
+	String j;
 
 	/* No args constructor that does nothing */
 	public Record() {
@@ -18,101 +18,104 @@ public class Record {
 	}
 	
 	/* Constructor with arguments */
-	public Record(String fname, String lname, String email, String gender, String image, String creditCard, String charge, String bool1, String bool2, String city) {
+	public Record(String a, String b, String c, String d, String e, String f, String g, String h, String i, String j) {
 		
-		this.fname = fname;
-		this.lname = lname;
-		this.email = email;
-		this.gender = gender;
-		this.image = image;
-		this.creditCard = creditCard;
-		this.charge = charge;
-		this.bool1 = bool1;
-		this.bool2 = bool2;
+		this.a = a;
+		this.b = b;
+		this.c = c;
+		this.d = d;
+		this.e = e;
+		this.f = f;
+		this.g = g;
+		this.h = h;
+		this.i = i;
+		this.j = j;
 	}
 	
-	public String getFname() {
-		return fname;
+	public String getA() {
+		return a;
 	}
 	
-	public void setFname(String fname) {
-		this.fname = fname;
+	public void setA(String a) {
+		this.a = a;
 	}
 	
-	public String getLname() {
-		return lname;
+	public String getB() {
+		return b;
 	}
 	
-	public void setLname(String lname) {
-		this.lname = lname;
+	public void setB(String b) {
+		this.b = b;
 	}
 	
-	public String getEmail() {
-		return email;
+	public String getC() {
+		return c;
 	}
 	
-	public void setEmail(String email) {
-		this.email = email;
+	public void setC(String c) {
+		this.c = c;
 	}
 	
-	public String getGender() {
-		return gender;
+	public String getD() {
+		return d;
 	}
 	
-	public void setGender(String gender) {
-		this.gender = gender;
+	public void setD(String d) {
+		this.d = d;
 	}
 	
-	public String getImage() {
-		return image;
+	public String getE() {
+		return e;
 	}
 	
-	public void setImage(String image) {
-		this.image = image;
+	public void setE(String e) {
+		this.e = e;
 	}
 	
-	public String getCreditCard() {
-		return creditCard;
+	public String getF() {
+		return f;
 	}
 	
-	public void setCreditCard(String creditCard) {
-		this.creditCard = creditCard;
+	public void setF(String f) {
+		this.f = f;
 	}
 	
-	public String getCharge() {
-		return charge;
+	public String getG() {
+		return g;
 	}
 	
-	public void setCharge(String charge) {
-		this.charge = charge;
+	public void setG(String g) {
+		this.g = g;
 	}
 	
-	public String getBool1() {
-		return bool1;
+	public String getH() {
+		return h;
 	}
 	
-	public void setBool1(String bool1) {
-		this.bool1 = bool1;
+	public void setH(String h) {
+		this.h = h;
 	}
 	
-	public String getBool2() {
-		return bool2;
+	public String getI() {
+		return i;
 	}
 	
-	public void setBool2(String bool2) {
-		this.bool2 = bool2;
+	public void setI(String i) {
+		this.i = i;
 	}
 	
-	public String getCity() {
-		return city;
+	public String getJ() {
+		return j;
 	}
 	
-	public void setCity(String city) {
-		this.city = city;
+	public void setJ(String j) {
+		this.j = j;
 	}
 	
 	@Override
     public String toString() {
-        return "Record{" + "fname=" + fname + ", lname='" + lname + ", email=" + email + ", gender=" + gender + '}';
+        return "Record{" + "A=" + a + ", B='" + b + ", C=" + c + 
+        		", D=" + d + ", E=" + e + ", F=" + f + ", G=" + g + 
+        		", H=" + h + ", I=" + i + ", J=" + j + '}';
     }
 }
