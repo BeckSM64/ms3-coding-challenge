@@ -4,7 +4,7 @@ This challenge, issued by Mountain State Software Solutions, asks to create a Ja
 
 ## Assumptions
 
-A few assumptions were made when working on this program. The project instructions stated that a 10 column CSV would be provided so the program assumes that the CSV passed in will contain 10 columns. It also assumes that if a column does not contain 10 columns then it contains 11 columns because all "bad data" columns in the CSV contained exactly 11 columns. A valid CSV file will contain a consistent amount of columns per row so this assumption only works in this particutlar instance.
+A few assumptions were made when working on this program. The project instructions stated that a 10 column CSV would be provided so the program assumes that the CSV passed in will contain 10 columns. It also assumes that if a column does not contain 10 columns then it contains 11 columns because all "bad data" columns in the CSV contained exactly 11 columns. A valid CSV file will contain a consistent number of columns per row, which will not necessarily be 10 or 11, so this assumption only works in this particutlar instance.
 
 ## Building the Project
 
