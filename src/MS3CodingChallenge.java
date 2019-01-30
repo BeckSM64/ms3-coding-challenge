@@ -1,65 +1,49 @@
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanReader;
+import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.CsvListReader;
+import org.supercsv.io.CsvListWriter;
 import org.supercsv.io.ICsvBeanReader;
+import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.io.ICsvListReader;
+import org.supercsv.io.ICsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
 public class MS3CodingChallenge {
 	
 	private static SQLiteDB db = new SQLiteDB();
 	
+	/* Get cell processors to match column number and type of data */
 	private static CellProcessor[] getProcessors() {
 	        
 	        final CellProcessor[] processors = new CellProcessor[] { 
 	        		
-	                new Optional(),//firstName
-	                new Optional(),//lastName
-	                new Optional(),//email
-	                new Optional(),//gender
-	                new Optional(),//image
-	                new Optional(),//credit card
-	                new Optional(),//charge
-	                new Optional(),//bool1
-	                new Optional(),//bool2
-	                new Optional(),//city
+	                new Optional(),//A
+	                new Optional(),//B
+	                new Optional(),//C
+	                new Optional(),//D
+	                new Optional(),//E
+	                new Optional(),//F
+	                new Optional(),//G
+	                new Optional(),//H
+	                new Optional(),//I
+	                new Optional()//J
 	        };
-	        
 	        return processors;
-	}
-	
-	/* Attempt at using bean reader but run into problem when rows with 11 columns show up at line 3072 in the provided CSV */
-	public static void readCSV() throws Exception {
-		
-		ICsvBeanReader beanReader = null;//SuperCSV bean reader object
-		try {
-			beanReader = new CsvBeanReader(new FileReader("./ms3Interview.csv"), CsvPreference.STANDARD_PREFERENCE);
-			final String[] header = beanReader.getHeader(true);
-			final CellProcessor[] processors = getProcessors();
-			
-			Record record;
-			while((record = beanReader.read(Record.class, header, processors)) != null) {
-				//record = beanReader.read(Record.class, header, processors);
-				System.out.println(String.format("lineNo=%s, rowNo=%s, record=%s", beanReader.getLineNumber(), beanReader.getRowNumber(), record));
-			}
-			
-		} finally {
-			
-			if(beanReader != null) {
-				beanReader.close();
-			}
-		}
 	}
 	
 	/* Parses the CSV with the list reader and inserts each row into an in-memory SQLite database (Needs to be cleaned up) */
@@ -70,10 +54,11 @@ public class MS3CodingChallenge {
         	listReader = new CsvListReader(new FileReader(csvFilePath), CsvPreference.STANDARD_PREFERENCE);
                 
             listReader.getHeader(true);
-            final CellProcessor[] processors = getProcessors();
                 
             List<Object> recordList;
             while( (listReader.read()) != null ) {
+            	
+            	CellProcessor[] processors = getProcessors();
             	
             	//Only process rows which contain the correct number of columns (10)
             	if(listReader.length() == 10) {
@@ -144,6 +129,30 @@ public class MS3CodingChallenge {
                 	}
                 	
                 	db.insert(a, b, c, d, e, f, g, h, i, j);//Insert into sqlite database
+                	
+            	} else if(listReader.length() == 11) {
+            		
+            		//Use this if columns are equal to 11 for a row
+            		processors = new CellProcessor[] { 
+        	        		
+        	                new Optional(),//A
+        	                new Optional(),//B
+        	                new Optional(),//C
+        	                new Optional(),//D
+        	                new Optional(),//E
+        	                new Optional(),//F
+        	                new Optional(),//G
+        	                new Optional(),//H
+        	                new Optional(),//I
+        	                new Optional(),//J
+        	                new Optional()//K (Extra column)
+        	        };
+            		
+            		recordList = listReader.executeProcessors(processors);
+            		System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s", listReader.getLineNumber(),
+                            listReader.getRowNumber(), recordList));
+            		writeCsv(recordList);
+            		//break;//Break when a row has 11 columns. For now
             	}
             }
                 
@@ -155,47 +164,53 @@ public class MS3CodingChallenge {
         }
 	}
 	
-	public static List<String[]> readCSVFile(String csvFilePath) {
-		
-		BufferedReader br = null;
-		String line = "";
-		String delimiter = ",";//Split data when a non-escaped comma appears
-		String[] dataRecord = null;
-		List<String[]> arrayListOfRecordArrays = new ArrayList<>();
-		
-		try {
-			br = new BufferedReader(new FileReader(csvFilePath));
-			while((line = br.readLine()) != null) {
-				
-				//Separate with delimiter into String array
-				dataRecord = line.split(delimiter);//Currently can't differentiate between commas meant as delimiters and commas part of data (Change to third party parser)
-				arrayListOfRecordArrays.add(dataRecord);
-			}
-			
-		} catch(FileNotFoundException e) {
-			e.printStackTrace();
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-			
-		} finally {
-			
-			if(br != null) {
-				try {
-					br.close();
-				} catch(IOException e) {
-					e.printStackTrace();
-				}
-			}
-		} return arrayListOfRecordArrays;//Return the string array containing csv data
-	}
+	/* Takes a record as a list of objects and writes them to a csv file with a timestamp */
+	public static void writeCsv(List<Object> record) throws IOException {
+                
+        ICsvListWriter listWriter = null;
+        try {
+        	Date currentTimestamp = new Date();
+        	Random rng = new Random();
+        	String writeToFilePath = "bad-data-" + rng.nextInt(30000) + ".csv";//Create the name of the file that will be written to
+        	listWriter = new CsvListWriter(new FileWriter(writeToFilePath),
+        	CsvPreference.STANDARD_PREFERENCE);//Create list writer with standard preferences
+                
+        	final CellProcessor[] processors = new CellProcessor[] { 
+	        		
+	                new Optional(),//A
+	                new Optional(),//B
+	                new Optional(),//C
+	                new Optional(),//D
+	                new Optional(),//E
+	                new Optional(),//F
+	                new Optional(),//G
+	                new Optional(),//H
+	                new Optional(),//I
+	                new Optional(),//J
+	                new Optional()//K (The extra column)
+	        };
+        	
+        	//Column Headers
+        	final String[] header = new String[] {"A", "B", "C", "D",
+            	"E", "F", "G", "H", "I", "J", "K"};
+                
+        	//Write the column headers to the specified csv file
+        	listWriter.writeHeader(header);
+                
+        	//Write the record to the file
+        	listWriter.write(record, processors);
+                
+        }
+        finally {
+        	if( listWriter != null ) {
+        		listWriter.close();
+            }
+        }
+    }
 	
 	public static void main(String[] args) {
 		
 		String csvFilePath = args[0];//Get the file path as an argument when program is run from terminal
-		//List<String[]> csvData;
-		//csvData = readCSVFile(csvFilePath);//Call to function that splits up the data into a arraylist of string arrays(Will probably change this)
-		
 		db.createTable();//Create the table for the SQLite database
 		
 		//Attempt to parse csv and write to database
@@ -205,15 +220,5 @@ public class MS3CodingChallenge {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//Set random data record to use to test sqlite database stuff below
-		//SQLiteDB db = new SQLiteDB();//Should print success or error
-		//db.createTable();//Create a new table in the database
-		
-		//Loop through records and insert each into database
-		//for(int i = 0; i < csvData.size(); i++) {
-			//String[] dataRecord = csvData.get(i);//Get the current data record
-			//db.insert(dataRecord[0], dataRecord[1], dataRecord[2], dataRecord[3], dataRecord[4], dataRecord[5], dataRecord[6], dataRecord[7], dataRecord[8], dataRecord[9]);//Test inserting a random record into database table called RECORD
-		//}
 	}
 }
