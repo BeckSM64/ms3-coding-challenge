@@ -19,7 +19,7 @@ import org.supercsv.prefs.CsvPreference;
 
 public class MS3CodingChallenge {
 	
-	private static SQLiteDB db = new SQLiteDB();
+	private static SQLiteDB db;//In memory sqlite database to write csv data to
 	private static int recordsReceived;
 	private static int recordsSuccessful;
 	private static int recordsFailed;
@@ -209,6 +209,7 @@ public class MS3CodingChallenge {
         }
     }
 	
+	/* Writes statistics to a log file in the same directory as the running program */
 	public static void writeLogFile() {
 		
 		String recordsReceivedString = "Records received: " + Integer.toString(recordsReceived);
@@ -221,7 +222,7 @@ public class MS3CodingChallenge {
 		
 		//Attempt to write to the log file
 		try {
-			Files.write(file, lines, Charset.forName("UTF-8"));
+			Files.write(file, lines, Charset.forName("UTF-8"));//Write to the text file using utf-8 encoding
 		} catch (IOException e) {
 			e.printStackTrace();//Print error if can't write to log file
 		}
@@ -235,6 +236,7 @@ public class MS3CodingChallenge {
 		recordsFailed = 0;
 		
 		String csvFilePath = args[0];//Get the file path as an argument when program is run from terminal
+		db = new SQLiteDB();//Create the in memory database to write the CSV records to
 		db.createTable();//Create the table for the SQLite database
 		
 		//Attempt to parse csv and write to database
