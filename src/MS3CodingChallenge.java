@@ -1,24 +1,18 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
-import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvBeanReader;
-import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.CsvListWriter;
-import org.supercsv.io.ICsvBeanReader;
-import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.io.ICsvListWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -26,6 +20,9 @@ import org.supercsv.prefs.CsvPreference;
 public class MS3CodingChallenge {
 	
 	private static SQLiteDB db = new SQLiteDB();
+	private static int recordsReceived;
+	private static int recordsSuccessful;
+	private static int recordsFailed;
 	
 	/* Get cell processors to match column number and type of data */
 	private static CellProcessor[] getProcessors() {
@@ -58,6 +55,7 @@ public class MS3CodingChallenge {
             List<Object> recordList;
             while( (listReader.read()) != null ) {
             	
+            	recordsReceived++;//Increment number of records received when one is encountered
             	CellProcessor[] processors = getProcessors();
             	
             	//Only process rows which contain the correct number of columns (10)
@@ -129,6 +127,7 @@ public class MS3CodingChallenge {
                 	}
                 	
                 	db.insert(a, b, c, d, e, f, g, h, i, j);//Insert into sqlite database
+                	recordsSuccessful++;//Increment number of records successfull
                 	
             	} else if(listReader.length() == 11) {
             		
@@ -152,7 +151,7 @@ public class MS3CodingChallenge {
             		System.out.println(String.format("lineNo=%s, rowNo=%s, customerList=%s", listReader.getLineNumber(),
                             listReader.getRowNumber(), recordList));
             		writeCsv(recordList);
-            		//break;//Break when a row has 11 columns. For now
+            		recordsFailed++;//Increment number of records failed (Too many columns)
             	}
             }
                 
@@ -210,7 +209,30 @@ public class MS3CodingChallenge {
         }
     }
 	
+	public static void writeLogFile() {
+		
+		String recordsReceivedString = "Records received: " + Integer.toString(recordsReceived);
+		String recordsSuccessfulString = "Records successful: " + Integer.toString(recordsSuccessful);
+		String recordsFailedString = "Records failed: " + Integer.toString(recordsFailed);
+		
+		//Store each string in a list of strings
+		List<String> lines = Arrays.asList(recordsReceivedString, recordsSuccessfulString, recordsFailedString);
+		Path file = Paths.get("log.txt");//Create the path to log file
+		
+		//Attempt to write to the log file
+		try {
+			Files.write(file, lines, Charset.forName("UTF-8"));
+		} catch (IOException e) {
+			e.printStackTrace();//Print error if can't write to log file
+		}
+	}
+	
 	public static void main(String[] args) {
+		
+		//Statistic variables (Static for now)
+		recordsReceived = 0;
+		recordsSuccessful = 0;
+		recordsFailed = 0;
 		
 		String csvFilePath = args[0];//Get the file path as an argument when program is run from terminal
 		db.createTable();//Create the table for the SQLite database
@@ -219,8 +241,9 @@ public class MS3CodingChallenge {
 		try {
 			readCSVListReader(csvFilePath);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		writeLogFile();//Write the statistics to a log file
 	}
 }
