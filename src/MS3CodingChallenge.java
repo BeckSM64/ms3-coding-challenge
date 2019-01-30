@@ -63,11 +63,11 @@ public class MS3CodingChallenge {
 	}
 	
 	/* Parses the CSV with the list reader and inserts each row into an in-memory SQLite database (Needs to be cleaned up) */
-	public static void readCSVListReader() throws IOException {
+	public static void readCSVListReader(String csvFilePath) throws IOException {
 		
 		ICsvListReader listReader = null;
         try {
-        	listReader = new CsvListReader(new FileReader("./ms3Interview.csv"), CsvPreference.STANDARD_PREFERENCE);
+        	listReader = new CsvListReader(new FileReader(csvFilePath), CsvPreference.STANDARD_PREFERENCE);
                 
             listReader.getHeader(true);
             final CellProcessor[] processors = getProcessors();
@@ -192,7 +192,7 @@ public class MS3CodingChallenge {
 	
 	public static void main(String[] args) {
 		
-		//String csvFilePath = args[0];//Get the file path as an argument when program is run from terminal
+		String csvFilePath = args[0];//Get the file path as an argument when program is run from terminal
 		//List<String[]> csvData;
 		//csvData = readCSVFile(csvFilePath);//Call to function that splits up the data into a arraylist of string arrays(Will probably change this)
 		
@@ -200,7 +200,7 @@ public class MS3CodingChallenge {
 		
 		//Attempt to parse csv and write to database
 		try {
-			readCSVListReader();
+			readCSVListReader(csvFilePath);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
